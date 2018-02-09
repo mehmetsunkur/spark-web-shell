@@ -7,24 +7,33 @@ import { ShellConsole } from './shell-console.model';
 import { ShellConsoleService } from './shell-console.service';
 import { Principal } from '../../shared';
 
+import {TerminalService} from 'primeng/components/terminal/terminalservice';
 
 
 
 @Component({
     selector: 'jhi-shell-console',
-    templateUrl: './shell-console.component.html'
+    templateUrl: './shell-console.component.html',
+    providers: [TerminalService]
 })
 export class ShellConsoleComponent implements OnInit, OnDestroy {
 shellConsoles: ShellConsole[];
     currentAccount: any;
     eventSubscriber: Subscription;
 
+    subscription: Subscription;
+    
     constructor(
         private shellConsoleService: ShellConsoleService,
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
-        private principal: Principal
+        private principal: Principal,
+        private terminalService: TerminalService
     ) {
+        this.terminalService.commandHandler.subscribe(command => {
+            let response = (command === 'date') ? new Date().toDateString() : 'Unknown command: ' + command;
+            this.terminalService.sendResponse(response);
+        });
     }
 
     loadAll() {
@@ -45,6 +54,9 @@ shellConsoles: ShellConsole[];
 
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
+        if(this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     trackId(index: number, item: ShellConsole) {

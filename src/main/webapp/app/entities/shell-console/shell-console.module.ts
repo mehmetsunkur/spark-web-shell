@@ -2,6 +2,9 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { SparkWebShellSharedModule } from '../../shared';
+
+import { TerminalModule } from 'primeng/terminal';
+
 import {
     ShellConsoleService,
     ShellConsolePopupService,
@@ -23,7 +26,8 @@ const ENTITY_STATES = [
 @NgModule({
     imports: [
         SparkWebShellSharedModule,
-        RouterModule.forChild(ENTITY_STATES)
+        RouterModule.forChild(ENTITY_STATES),
+        TerminalModule
     ],
     declarations: [
         ShellConsoleComponent,
@@ -43,6 +47,7 @@ const ENTITY_STATES = [
     providers: [
         ShellConsoleService,
         ShellConsolePopupService,
+        TerminalModule
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
