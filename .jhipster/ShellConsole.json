@@ -1,0 +1,16 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "command",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180209200207",
+    "entityTableName": "shell_console",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false
+}

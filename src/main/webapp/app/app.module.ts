@@ -18,6 +18,8 @@ import { SparkWebShellAccountModule } from './account/account.module';
 import { SparkWebShellEntityModule } from './entities/entity.module';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+
 import {
     JhiMainComponent,
     NavbarComponent,
@@ -31,6 +33,7 @@ import {
 @NgModule({
     imports: [
         BrowserModule,
+        BrowserAnimationsModule,
         SparkWebShellAppRoutingModule,
         Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-'}),
         SparkWebShellSharedModule,

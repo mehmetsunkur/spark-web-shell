@@ -1,0 +1,11 @@
+entity ShellConsole {
+	command String,
+}
+
+
+dto * with mapstruct
+
+// Set service options to all except few
+//service all with serviceImpl except Employee, Job, DataColumn
+// Set an angular suffix
+//angularSuffix * with spshl
