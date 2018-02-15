@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, Input, EventEmitter, ViewChild, AfterViewInit, AfterContentInit} from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, Input, EventEmitter, ViewChild, AfterViewInit, AfterContentInit, ElementRef} from '@angular/core';
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
@@ -32,6 +32,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
     ws: WebSocket;
     commandLine: String = '';
     @ViewChild(ɵa) terminalComponent: ɵa;
+    @ViewChild('commandLine') commandLineElement:ElementRef;
     
     constructor(
         private terminalService: TerminalService,
@@ -62,7 +63,8 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
         
         this.GetInstanceStatus().subscribe((result) => {
             this.bf.write(result);
-            //window.scrollTo(0,document.body.scrollHeight);
+            //this.commandLineElement.nativeElement.selectAll();
+            window.scrollTo(0,document.body.scrollHeight);
           });
     }
 
@@ -75,8 +77,8 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
       }
 
     onInit(bf: TerminalBuffer) {
+        this.terminalComponent.viewMode = true;
         this.bf = bf;
-        this.bf.setAnsiEscapeMode(true);
     }
     onNext(e: Event) {
         console.log(e.toString());
