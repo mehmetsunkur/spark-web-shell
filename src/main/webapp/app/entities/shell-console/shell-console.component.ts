@@ -9,6 +9,7 @@ import { Principal } from '../../shared';
 
 import {TerminalService} from 'primeng/components/terminal/terminalservice';
 
+import { ShellConsoleWebSocketService } from './shell-console-ws.service';
 
 
 @Component({
@@ -28,11 +29,14 @@ shellConsoles: ShellConsole[];
         private jhiAlertService: JhiAlertService,
         private eventManager: JhiEventManager,
         private principal: Principal,
-        private terminalService: TerminalService
+        private terminalService: TerminalService,
+        private shellConsoleWebSocketService: ShellConsoleWebSocketService,
     ) {
+        
         this.terminalService.commandHandler.subscribe(command => {
             let response = (command === 'date') ? new Date().toDateString() : 'Unknown command: ' + command;
             this.terminalService.sendResponse(response);
+            this.shellConsoleWebSocketService.sendCommand(command);
         });
     }
 
@@ -50,6 +54,12 @@ shellConsoles: ShellConsole[];
             this.currentAccount = account;
         });
         this.registerChangeInShellConsoles();
+
+        this.shellConsoleWebSocketService.connect();
+        this.shellConsoleWebSocketService.receive().subscribe((activity) => {
+            console.log("activity.... received: " + activity.time);
+            this.terminalService.sendResponse("activity.... received: " + activity.time);
+        });
     }
 
     ngOnDestroy() {
@@ -57,6 +67,7 @@ shellConsoles: ShellConsole[];
         if(this.subscription) {
             this.subscription.unsubscribe();
         }
+        this.shellConsoleWebSocketService.unsubscribe();
     }
 
     trackId(index: number, item: ShellConsole) {

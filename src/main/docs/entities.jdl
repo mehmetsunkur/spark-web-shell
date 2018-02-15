@@ -2,6 +2,14 @@ entity ShellConsole {
 	command String,
 }
 
+entity Shell {
+	title String,
+}
+
+entity Terminal {
+	title String,
+}
+
 
 dto * with mapstruct
 

@@ -17,6 +17,7 @@ import {
     shellConsoleRoute,
     shellConsolePopupRoute,
 } from './';
+import { ShellConsoleWebSocketService } from './shell-console-ws.service';
 
 const ENTITY_STATES = [
     ...shellConsoleRoute,
@@ -47,7 +48,8 @@ const ENTITY_STATES = [
     providers: [
         ShellConsoleService,
         ShellConsolePopupService,
-        TerminalModule
+        TerminalModule,
+        ShellConsoleWebSocketService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

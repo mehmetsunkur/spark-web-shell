@@ -18,14 +18,14 @@ export class JhiTrackerService {
     listener: Observable<any>;
     listenerObserver: Observer<any>;
     alreadyConnectedOnce = false;
-    private subscription: Subscription;
+    protected subscription: Subscription;
 
     constructor(
-        private router: Router,
-        private authServerProvider: AuthServerProvider,
-        private $window: WindowRef,
+        protected router: Router,
+        protected authServerProvider: AuthServerProvider,
+        protected $window: WindowRef,
         // tslint:disable-next-line: no-unused-variable
-        private csrfService: CSRFService
+        protected csrfService: CSRFService
     ) {
         this.connection = this.createConnection();
         this.listener = this.createListener();
@@ -53,7 +53,7 @@ export class JhiTrackerService {
             if (!this.alreadyConnectedOnce) {
                 this.subscription = this.router.events.subscribe((event) => {
                   if (event instanceof NavigationEnd) {
-                    this.sendActivity();
+                    //this.sendActivity();
                   }
                 });
                 this.alreadyConnectedOnce = true;
@@ -102,13 +102,13 @@ export class JhiTrackerService {
         this.listener = this.createListener();
     }
 
-    private createListener(): Observable<any> {
+    protected createListener(): Observable<any> {
         return new Observable((observer) => {
             this.listenerObserver = observer;
         });
     }
 
-    private createConnection(): Promise<any> {
+    protected createConnection(): Promise<any> {
         return new Promise((resolve, reject) => this.connectedPromise = resolve);
     }
 }

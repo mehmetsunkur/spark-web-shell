@@ -8,6 +8,8 @@
             "entities": {
                 "main": "Entities",
                 "shellConsole": "Shell Console",
+                "shell": "Shell",
+                "terminal": "Terminal",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

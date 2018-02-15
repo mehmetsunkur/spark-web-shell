@@ -35,6 +35,18 @@
                             <span jhiTranslate="global.menu.entities.shellConsole">Shell Console</span>
                         </a>
                     </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="shell" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                            <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+                            <span jhiTranslate="global.menu.entities.shell">Shell</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="terminal" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                            <i class="fa fa-fw fa-asterisk" aria-hidden="true"></i>
+                            <span jhiTranslate="global.menu.entities.terminal">Terminal</span>
+                        </a>
+                    </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
