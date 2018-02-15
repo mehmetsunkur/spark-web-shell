@@ -6,13 +6,12 @@ import java.io.PrintWriter;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.apache.spark.repl.SparkILoop;
 
 import scala.tools.nsc.Settings;
 
 public class SparkILoopThread implements Runnable {
 	private PrintWriter out;
-	private BufferedReader in; 
+	private BufferedReader in;
 	private SparkILoop iLoop;
 
 	public SparkILoopThread(BufferedReader in, PrintWriter out) {
@@ -31,12 +30,11 @@ public class SparkILoopThread implements Runnable {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("scala");
         //engine.eval()
         //((MutableSettings.BooleanSetting)(((IMain)engine).settings().usejavacp())).value_$eq(true);
-        
+
         this.iLoop = new SparkILoop(this.in,this.out);
         Settings settings = new Settings();
-
         iLoop.process(settings);
-		
+
 	}
-	
+
 }
