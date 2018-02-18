@@ -9,20 +9,51 @@ import { Principal } from '../../shared';
 import { TerminalBuffer, keyMap, ɵa } from 'ng-terminal';
 import { WindowRef } from '../../shared/tracker/window.service';
 import { AuthServerProvider } from '../../shared/auth/auth-jwt.service';
-import { Observable } from 'rxjs/Observable';
+import {FormControl} from '@angular/forms';
 
+import {Observable} from 'rxjs/Observable';
+import {startWith} from 'rxjs/operators/startWith';
+import {map} from 'rxjs/operators/map';
+import {MatAutocompleteModule} from '@angular/material';
+export class Command {
+    constructor(public command: string, public lastUsageTime: Date, public count: number) { }
+  }
 
 
 @Component({
     selector: 'jhi-terminal',
     templateUrl: './terminal.component.html',
     styles: [`
-    :host ::ng-deep .terminal-view-port{
-        //max-height: 500px;
+    .terminal-canvas{
+        color: white;
+        text-align: left;
     }
+
+    .terminal-view-port{
+        background-color: black;
+        overflow-y: auto;
+        overflow-wrap: break-word;
+        width: 100%;
+        height: 100%;
+    }
+
+    .typing-unit{
+        font-family: monospace; 
+        border-width: opx;
+    }
+    .command-form {
+        min-width: 150px;
+        //max-width: 500px;
+        width: 100%;
+      }
+      
+      .command-full-width {
+        width: 100%;
+      }
+      
     `]
 })
-export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
+export class TerminalComponent implements OnInit, OnDestroy {
     
 
     terminals: Terminal[];
@@ -30,9 +61,36 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
     eventSubscriber: Subscription;
     public bf: TerminalBuffer;
     ws: WebSocket;
-    commandLine: String = '';
+    commandLine: string = '';
     @ViewChild(ɵa) terminalComponent: ɵa;
-    @ViewChild('commandLine') commandLineElement:ElementRef;
+    commandCtrl: FormControl;
+    filteredCommands: Observable<any[]>;
+    commandHistoryNavIndex: number = 0;
+    waitingResponse: boolean = false;
+
+
+    commands: Command[] = [
+    {
+        command: ':help',
+        lastUsageTime: null,
+        count: 0
+    },
+    {
+        command: ':history',
+        lastUsageTime: null,
+        count: 0
+      },    
+      {
+        command: ':implicits',
+        lastUsageTime: null,
+        count: 0
+      },
+  ];
+
+  filterStates(name: string) {
+    return this.commands.filter(commandItem =>
+        commandItem.command.toLowerCase().indexOf(name.toLowerCase()) >= 0);
+  }
     
     constructor(
         private terminalService: TerminalService,
@@ -42,7 +100,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
         private $window: WindowRef,
         private authServerProvider: AuthServerProvider,
     ) {
-        
+        this.commandCtrl = new FormControl(); 
     }
 
     initWs() {
@@ -63,7 +121,10 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
         
         this.GetInstanceStatus().subscribe((result) => {
             this.bf.write(result);
-            //this.commandLineElement.nativeElement.selectAll();
+            if(this.waitingResponse){
+                this.waitingResponse = false;
+            }
+            
             window.scrollTo(0,document.body.scrollHeight);
           });
     }
@@ -83,83 +144,69 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
     onNext(e: Event) {
         console.log(e.toString());
     }
-    onKeyUpCommandInput(e: KeyboardEvent) {
-        var x = e.which || e.keyCode;
-        //this.ws.send(':help' + keyMap.Linefeed);
-        //this.bf.write(e.key);
-        console.log("event.type " + e.type + ":" + e.key);
+
+    onCommandKey(e: KeyboardEvent) {
         if (e.key == 'Enter') {
-            this.ws.send(this.commandLine + keyMap.Return );
-            this.bf.write(this.commandLine + keyMap.Linefeed + keyMap.Return);
-            this.commandLine = '';
-            //this.terminalComponent.scrollDown();
+            this.onEnter(e);
+        } else if (e.key == 'ArrowUp') {
+            this.onUp(e);
+        } else if (e.key == 'ArrowDown') {
+            this.onDown(e);
+        }
+    }
+
+    onDown(e: KeyboardEvent) {
+        
+        if(this.commandHistoryNavIndex>0){
+            this.commandHistoryNavIndex--;
+        }
+        let cmd = this.commands[this.commandHistoryNavIndex];
+        if(cmd){
+            this.commandLine = cmd.command;    
         }
         
     }
-    
-    onKey(e: KeyboardEvent) {
-        var x = e.which || e.keyCode;
-        //this.ws.send(':help' + keyMap.Linefeed);
-        //this.bf.write(e.key);
-        console.log("event.type " + e.type + ":" + e.key);
+
+    onUp(e: KeyboardEvent) {
+        if(this.commandHistoryNavIndex<this.commands.length-1){
+            this.commandHistoryNavIndex++;
+        }
+        let cmd = this.commands[this.commandHistoryNavIndex];
+        if(cmd){
+            this.commandLine = cmd.command;    
+        }
         
         
-        
-        if (e.key == 'Enter') {
-            //this.bf.write(keyMap.Linefeed);
+    }
+
+
+    onEnter(e: KeyboardEvent) {
+        if(this.commandCtrl.value !=''){
+            this.commandLine = this.commandCtrl.value;
             this.ws.send(this.commandLine + keyMap.Return );
-            this.bf.write(keyMap.Linefeed + keyMap.Return);
+            this.waitingResponse = true;
+            this.bf.write(this.commandLine + keyMap.Linefeed + keyMap.Return);
+            this.pushCommandToHistory(this.commandLine)
             this.commandLine = '';
-        } else if (e.key == 'Backspace') {
-            this.bf.write(keyMap.BackSpace);
-        } else if (e.key == 'ArrowLeft') {
-            this.bf.write(keyMap.ArrowLeft);
-        } else if (e.key == 'ArrowRight') {
-            this.bf.write(keyMap.ArrowRight);
-        } else if (e.key == 'ArrowUp') {
-            //this.bf.write(keyMap.ArrowUp);
-        } else if (e.key == 'ArrowDown') {
-            //this.bf.write(keyMap.ArrowDown);
-        } else if (e.key == 'Delete') {
-            this.bf.write(keyMap.Delete);
-        } else if (e.key == 'Home') {
-            //this.bf.write(keyMap.KeyHome);
-        } else if (e.key == 'End') {
-            this.bf.write(keyMap.KeyEnd);
-        } else if (e.key == 'Tab') {
-            this.bf.write(keyMap.Tab);
-        } else if (e.key == 'Insert') {
-            this.bf.write(keyMap.Insert);
-        } else if (e.type == 'compositionstart') {
-            this.bf.write(' ');
-        } else if (e.type == 'compositionupdate' && e.key.length == 1) {
-            if (this.bf.isInsertMode()) {
-                this.bf.write('\b');
-                this.bf.write(e.key);
-            } else {
-                this.bf.write(keyMap.ArrowLeft);
-                this.bf.write(e.key);
-            }
-        } else if (e.type == 'compositionend' && e.key.length == 1) {
-            if (e.key < '\u007f') { //ignore writing low unicode key in mobile. It should be written in textInput event
-                if (this.bf.isInsertMode())
-                    this.bf.write('\b');
-                else
-                    this.bf.write(keyMap.ArrowLeft);
-            } else if (this.bf.isInsertMode()) {
-                this.bf.write('\b');
-                this.bf.write(e.key);
-            } else {
-                this.bf.write(keyMap.ArrowLeft);
-                this.bf.write(e.key);
-            }
-        } else
-            if (e.key.length == 1){
-                this.bf.write(e.key + '');
-                this.commandLine += e.key + ''; //String.fromCharCode(e.keyCode);
-            }
-                
-    }  
+            this.commandCtrl.setValue('');
+        }
+    }
+
+    pushCommandToHistory(commandStr: string){
+        let command = this.commands.find(cmd => cmd.command === commandStr);
+        if(command){
+            command.count++;
+            command.lastUsageTime = new Date();
+        }else{
+            command = new Command(commandStr, new Date, 1);
+            this.commands.push(command);
+        }
+        this.commands.sort((c1,c2) =>  {
+            let cn1 = c1.lastUsageTime ? c1.lastUsageTime.getMilliseconds() : 0;
+            let cn2 = c2.lastUsageTime ? c2.lastUsageTime.getMilliseconds() : 0;
+            return (cn1 - cn2);
+        });
+    }
 
     loadAll() {
         this.terminalService.query().subscribe(
@@ -177,11 +224,6 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterContentInit {
             this.currentAccount = account;
         });
         this.registerChangeInTerminals();
-    }
-
-    ngAfterContentInit(): void {
-        this.terminalComponent.terminalViewPort.nativeElement.
-        this.ws.send("init");
     }
     
     ngOnDestroy() {

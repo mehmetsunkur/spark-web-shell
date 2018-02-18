@@ -5,7 +5,7 @@
         <span>Spark Web Shell Terminal</span>
     </h2>
     <jhi-alert></jhi-alert>
-    <div >
+    <div  >
             <ng-terminal
             (onInit)="onInit($event)" 
             (onKey)="onKey($event)" 
@@ -13,55 +13,23 @@
             >
             </ng-terminal>
     </div>
-    <div class="row">
-        <div >
-            <label  for="commandLine">Command</label>
-             <input (keyup)="onKeyUpCommandInput($event)" type="text" [(ngModel)]="commandLine" name="commandLine" id="commandLine" >
-     </div>
+    <div>
+
     </div>
     
     <br/>
-    <div class="table-responsive" *ngIf="terminals">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-            <th><span jhiTranslate="global.field.id">ID</span></th>
-            <th><span jhiTranslate="sparkWebShellApp.terminal.title">Title</span></th>
-            <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let terminal of terminals ;trackBy: trackId">
-                <td><a [routerLink]="['../terminal', terminal.id ]">{{terminal.id}}</a></td>
-                <td>{{terminal.title}}</td>
-                <td class="text-right">
-                    <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['../terminal', terminal.id ]"
-                                class="btn btn-info btn-sm">
-                            <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'terminal/'+ terminal.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'terminal/'+ terminal.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    
+    <form class="command-form">
+            <mat-form-field class="command-full-width">
+              <input matInput placeholder="Command" aria-label="Command" 
+              [ngModel]="commandLine"
+              [formControl]="commandCtrl" (keydown)="onCommandKey($event)" /> 
+              
+            </mat-form-field>
+          
+            <br />
+            <mat-progress-bar *ngIf="waitingResponse" mode="indeterminate"></mat-progress-bar>
+          </form>
+          
+    <br/>
 </div>
