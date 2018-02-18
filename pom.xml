@@ -12,7 +12,8 @@
         <!-- Build properties -->
         <maven.version>3.0.0</maven.version>
         <java.version>1.8</java.version>
-        <scala.version>2.12.1</scala.version>
+        <scala.version>2.11.8</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
         <node.version>v8.9.4</node.version>
         <yarn.version>v1.3.2</yarn.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
