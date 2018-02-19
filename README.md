@@ -1,4 +1,13 @@
 # SparkWebShell
+
+This is an experimental project. Not to use production. 
+
+ It allows to use spark-shell functions via web interface. Creates web socket sessions between Apache Spark shell(spark-shell) threads and angular client.
+
+![play.gif](play.gif)
+
+Thanks to NgTerminal - https://github.com/qwefgh90/ng-terminal
+
 This application was generated using JHipster 4.14.0, you can find documentation and help at [http://www.jhipster.tech/documentation-archive/v4.14.0](http://www.jhipster.tech/documentation-archive/v4.14.0).
 
 ## Development
